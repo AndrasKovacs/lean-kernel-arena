@@ -11,7 +11,7 @@
         buildInputs = with pkgs; [
           (python3.withPackages (p : with p; [ jinja2 pyyaml jsonschema markdown ]))
           elan
-          rustc 
+          rustc
           cargo
           perf
           libffi
@@ -21,6 +21,9 @@
           pypy
           monolith
           nodejs
+          ocaml
+          opam
+          gmp
         ];
       };
     };
