@@ -6,6 +6,7 @@ rev: a748f56ffd8fee099ad3a6a3e682156d42d51781
 build: |
   export OPAMROOT="$PWD/.opam-root"
   opam init --bare --disable-sandboxing -n
+  opam option --global depext=false
   opam switch create . ocaml-system -y
 run: |
   ulimit -v 1000000 -c 0
