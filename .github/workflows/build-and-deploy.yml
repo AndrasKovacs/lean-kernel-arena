@@ -86,12 +86,12 @@ jobs:
         shell: 'nix develop -c bash -euxo pipefail {0}'
         continue-on-error: true
       
-      - name: Generate tests
-        run: ./lka.py build-test ${{ github.event_name != 'workflow_dispatch' && '--skip-ci' || '' }}
-        shell: 'nix develop -c bash -euxo pipefail {0}'
-      
       - name: Build checkers
         run: ./lka.py build-checker
+        shell: 'nix develop -c bash -euxo pipefail {0}'
+
+      - name: Generate tests
+        run: ./lka.py build-test ${{ github.event_name != 'workflow_dispatch' && '--skip-ci' || '' }}
         shell: 'nix develop -c bash -euxo pipefail {0}'
       
       - name: Run checkers on tests
