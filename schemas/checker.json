@@ -46,6 +46,11 @@
     "serious": {
       "type": "boolean",
       "description": "If false, this checker is omitted from the main comparison tables (default: true)"
+    },
+    "threads": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Worker threads the checker runs concurrently; the parallel runner reserves this many CPU slots to avoid oversubscribing (default: 1)"
     }
   },
   "required": ["run"],

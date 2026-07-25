@@ -20,7 +20,7 @@ jobs:
           mode: create
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
-          server_type: ccx23
+          server_type: ccx43
           location: nbg1  # Nuremberg, Germany
           image: ubuntu-24.04
           ssh_key: ${{ secrets.HCLOUD_SSH_KEY_ID }}
@@ -29,7 +29,7 @@ jobs:
     needs: create-runner # required to start the main job when the runner is ready
     runs-on: ${{ needs.create-runner.outputs.label || 'ubuntu-latest' }} # run on custom runner if available, otherwise default
     if: always() # Run even if create-runner was skipped
-    timeout-minutes: 600
+    timeout-minutes: 120
     
     permissions:
       contents: read

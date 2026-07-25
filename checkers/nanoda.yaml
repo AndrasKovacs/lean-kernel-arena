@@ -18,6 +18,7 @@ description: |
 url: https://github.com/ammkrn/nanoda_lib
 ref: master
 rev: f58f2f6d535e189a40fcb02ede8eb95f97a92d37
+threads: 4
 build: |
   cargo build --release
   cat > config.json <<__END__

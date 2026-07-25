@@ -3,6 +3,7 @@ description: |
 url: https://github.com/SchrodingerZhu/still-nanoda
 ref: cache-study-port
 rev: 06a07b74436f8a111df836312ccac3a41b93c7b6
+threads: 4
 build: |
   cargo build --release
   cat > config.json <<__END__

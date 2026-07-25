@@ -10,6 +10,7 @@
 """Lean Kernel Arena - Tool for managing Lean kernel tests and checkers."""
 
 import argparse
+import concurrent.futures
 import datetime
 import fnmatch
 import json
@@ -18,6 +19,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -1258,6 +1260,26 @@ def run_checker_on_test(checker: dict, test: dict, build_dir: Path, tests_dir: P
     return result_data
 
 
+class CoreBudget:
+    def __init__(self, total: int):
+        self.total = max(1, total)
+        self.available = self.total
+        self.cond = threading.Condition()
+
+    def acquire(self, cores: int) -> int:
+        cores = max(1, min(cores, self.total))
+        with self.cond:
+            while self.available < cores:
+                self.cond.wait()
+            self.available -= cores
+        return cores
+
+    def release(self, cores: int) -> None:
+        with self.cond:
+            self.available += cores
+            self.cond.notify_all()
+
+
 def cmd_run_checker(args: argparse.Namespace) -> int:
     """Handle the run command."""
     build_dir = get_project_root() / "_build" / "checkers"
@@ -1303,13 +1325,31 @@ def cmd_run_checker(args: argparse.Namespace) -> int:
         print("No built tests found.")
         return 0
 
+    budget = args.jobs if args.jobs and args.jobs > 0 else (os.cpu_count() or 1)
+    cores = CoreBudget(budget)
+
+    def run_one(checker, test):
+        held = cores.acquire(int(checker.get("threads", 1) or 1))
+        try:
+            return run_checker_on_test(checker, test, build_dir, tests_dir, results_dir)
+        finally:
+            cores.release(held)
+
     results = []
-    for checker in checkers:
-        for test in tests:
-            print(f"Running {checker['name']} on {test['name']}...", end="\n" if VERBOSE else " ")
-            result = run_checker_on_test(checker, test, build_dir, tests_dir, results_dir)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=budget) as executor:
+        futures = {}
+        for checker in checkers:
+            for test in tests:
+                future = executor.submit(run_one, checker, test)
+                futures[future] = (checker, test)
+
+        for future in concurrent.futures.as_completed(futures):
+            checker, test = futures[future]
+            result = future.result()
             results.append(result)
-            
+
+            print(f"Ran {checker['name']} on {test['name']}", end="\n" if VERBOSE else " ")
+
             # Choose emoji based on status
             status = result.get('status', 'error')
             if status == 'accepted':
@@ -1946,6 +1986,13 @@ def main() -> int:
     run_checker_parser.add_argument(
         "--test",
         help="Name or glob pattern of the test to run (default: all tests)",
+    )
+    run_checker_parser.add_argument(
+        "-j",
+        "--jobs",
+        type=int,
+        default=None,
+        help="CPU-core budget for parallel runs; each checker reserves its declared 'threads' (default: number of CPUs; 1 disables parallelism)",
     )
 
     # build-site command

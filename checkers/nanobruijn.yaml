@@ -27,6 +27,7 @@ description: |
 url: https://github.com/nomeata/nanobruijn
 ref: master
 rev: 5a42fcc40f97901f886f8fe176d2f4dcd798db7e
+threads: 4
 build: |
   cargo build --release
   cat > config.json <<__END__
