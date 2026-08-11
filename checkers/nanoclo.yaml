@@ -7,11 +7,14 @@ description: |
   entry through skew-binary jump pointers; substitution into a body happens
   only when a type leaves the checker.
 
+  Conversion is [sokonanoda](https://github.com/intgrah/sokonanoda)'s
+  (Apache-2.0), as is the fast path of the export parser.
+
   The modifications from the original nanoda_lib were written by Claude
   (Anthropic), directed by Sebastian Graf.
 url: https://github.com/sgraf812/nanoclo
 ref: main
-rev: 15b3560a7ad931a71c1500ffd6142805344b51c4
+rev: b27e4c5f788717c884020f1dde4bb7193bca2276
 build: |
   cargo build --release
   cat > config.json <<__END__
