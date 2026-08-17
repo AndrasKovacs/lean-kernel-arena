@@ -7,7 +7,7 @@ description: |
 version: "0.1.0"
 url: https://github.com/sankalpsthakur/kiota
 ref: main
-rev: 84b2fc41919cb56874ea6a4a62361e357d708ed1
+rev: 784039f213f3692912aa1122849710fc6e4f9bf9
 build: cargo build --release
 run: timeout 30s ./target/release/kiota "$IN"
 # Only the large corpora are declined; every short test is run and reported.
@@ -17,3 +17,4 @@ declines:
   - mathlib
   - cslib
   - cedar
+
